@@ -38,32 +38,18 @@ class AppController
 
     }
 
-    public function homeAction($page = 0, $errorMsg = '')
+    public function homeAction($page = 0, $errorMsg = '', $url = false)
     {
-        $perPage = 5;
-        $query = Manager::table('short_urls')
-            ->where('is_deleted', '=', 0)
-            ->orderBy('updated_at', 'DESC');
-
-        $countPages = ceil($query->count()/$perPage);
-        $urls = $query->forPage($page + 1, $perPage)->get();
-
-        if ($page > 0 && !$urls) {
-            $this->error404Action();
-        } else {
+        $this->smarty->assign('title', 'Short link service');
+        $this->smarty->assign('error', $errorMsg);
+        $shortLink = '';
+        if ($url instanceof ShortUrl) {
             $converter = new Converter();
-            foreach ($urls as &$url) {
-                $url['short'] = $this->request->getHTTPHost() . '/' . $converter->dec2link($url['id']);
-            }
-
-            $this->smarty->assign('title', 'Short link service');
-            $this->smarty->assign('error', $errorMsg);
-            $this->smarty->assign('urls', $urls);
-            $this->smarty->assign('countPages', $countPages);
-            $this->smarty->assign('page', $page + 1);
-            $this->smarty->display('index.tpl');
+            $shortLink = $this->request->getHTTPHost() . '/' . $converter->dec2link($url->id);
+            $this->smarty->assign('shortLink', $shortLink);
         }
-
+        $this->smarty->assign('shortLink', $shortLink);
+        $this->smarty->display('index.tpl');
     }
 
     public function redirectAction($page)
@@ -104,7 +90,7 @@ class AppController
         $shortUrl->update();
     }
 
-    private function createShortLink()
+    public function createShortLink()
     {
         try{
             $url = new URL(trim($this->request->get('full_url')));
@@ -136,18 +122,43 @@ class AppController
         } else {
             $shortUrl->save();
         }
+
+        $this->homeAction(0, false, $shortUrl);
     }
 
-
-    public function createOrDeleteShortLink()
+    public function getAllAction($page = 0, $errorMsg = '')
     {
-
         if (!is_null($id = $this->request->get('delete'))) {
             $this->deleteShortLink($id);
-        } else {
-            $this->createShortLink();
         }
 
-        $this->homeAction();
+        $perPage = 5;
+        $query = Manager::table('short_urls')
+            ->where('is_deleted', '=', 0)
+            ->orderBy('updated_at', 'DESC');
+
+        $countPages = ceil($query->count()/$perPage);
+        $urls = $query->forPage($page + 1, $perPage)->get();
+
+        if ($page > 0 && !$urls) {
+            $this->error404Action();
+        } else {
+            $converter = new Converter();
+            foreach ($urls as &$url) {
+                $url['short'] = $this->request->getHTTPHost() . '/' . $converter->dec2link($url['id']);
+            }
+
+            $this->smarty->assign('title', 'Short link service');
+            $this->smarty->assign('error', $errorMsg);
+            $this->smarty->assign('urls', $urls);
+
+            $this->smarty->assign('time', time()); // cache disable
+
+            $this->smarty->assign('countPages', $countPages ? $countPages : $countPages + 1);
+            $this->smarty->assign('page', $page + 1);
+            $this->smarty->display('all.tpl');
+        }
+
     }
+
 }

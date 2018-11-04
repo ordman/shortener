@@ -9,46 +9,13 @@
     <input type="text" style="width: 500px" name="full_url" id="full_url">
     <input type="submit" value="Get short link"/>
     <p style="color: red">{$error}</p>
-{if $countPages > 0}
-    Page {$page} from {$countPages}
-
-    <table border="1" cellpadding="5">
-
-        <thead>
-        <th>Id</th>
-        <th>Short url</th>
-        <th>Full url</th>
-        <th>Created</th>
-        <th>Action</th>
-        </thead>
-        <tbody>
-        {foreach from=$urls item=item}
-            <tr>
-                <td>{$item.id}</td>
-                <td><a href="{$item.short}" target="_blank">{$item.short}</a></td>
-                <td>{$item.url}</td>
-                <td>{$item.updated_at}</td>
-                <td>
-                    <button type="submit" name="delete" value="{$item.id}">Delete</button>
-                </td>
-            </tr>
-        {/foreach}
-        </tbody>
-    </table>
-    <br><br>
-    {if $page > 1}
-        <a href="/page/{$page-2}"> << Previous </a>
+    {if $shortLink != ''}
+        <p style="color: green">
+           Your short link is <a href="{$shortLink}" target="_blank">{$shortLink}</a>
+        </p>
     {/if}
-
-    {if $page > 1 && $page < $countPages}
-        <span> ::: </span>
-    {/if}
-
-    {if $page < $countPages}
-        <a href="/page/{$page}"> Next >> </a>
-    {/if}
-
-{/if}
+    <br>
+    <a href="/all-links" target="_blank"> All links</a>
 </form>
 </body>
 </html>

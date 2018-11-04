@@ -51,8 +51,10 @@ try {
     $router = new \http\Router($request);
 
     $router->add('/', '/', 'http\\controllers\\AppController:homeAction', 'GET');
-    $router->add('createOrDelete', '/', 'http\\controllers\\AppController:createOrDeleteShortLink', 'POST');
+    $router->add('create', '/', 'http\\controllers\\AppController:createShortLink', 'POST');
     $router->add('url', '/(id:any)', 'http\\controllers\\AppController:redirectAction');
+    $router->add('all', '/all-links', 'http\\controllers\\AppController:getAllAction');
+    $router->add('allPost', '/all-links', 'http\\controllers\\AppController:getAllAction', 'POST');
     $router->add('page', '/page/(id:num)', 'http\\controllers\\AppController:homeAction');
 
     $route = $router->match($request->getMethod(), $request->getPathInfo());
