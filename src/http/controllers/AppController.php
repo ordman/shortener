@@ -119,7 +119,7 @@ class AppController
         // update if exist same
         $shortUrl = ShortUrl::firstByAttributes(array('hash' => $hash,'is_deleted' => 0));
 
-        if (is_null($shortUrl)) { // try use deleted id for optimisation
+        if (is_null($shortUrl)) { // try to use deleted id for optimization
             $shortUrl = ShortUrl::firstByAttributes(array('is_deleted' => 1));
         }
 

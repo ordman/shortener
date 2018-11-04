@@ -3,7 +3,7 @@
 
 PHP >= 5.3
 
-Apache
+Apache with enabled mod_rewrite
 
 Composer https://getcomposer.org/download/
 
